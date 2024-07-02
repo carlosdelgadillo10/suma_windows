@@ -11,9 +11,12 @@ pipeline {
         stage('Setup Python Environment') {
             steps {
                 script {
-                    // Instalación de dependencias en un entorno virtual
-                    sh 'python3 -m venv venv'
-                    sh './venv/bin/pip install -r requirements.txt'
+                    // Instalación de dependencias en un entorno virtual en Windows
+                    bat '''
+                        python -m venv venv
+                        call venv\\Scripts\\activate
+                        pip install -r requirements.txt
+                    '''
                 }
             }
         }
@@ -21,33 +24,32 @@ pipeline {
         stage('Run Tests and Coverage') {
             steps {
                 script {
-                    // Ejecutar pruebas y cobertura con pytest
-                    sh '''
-                        . venv/bin/activate
-                        export PYTHONPATH=$PWD
-                        pytest --cov=app --cov-report=xml:coverage.xml --cov-report=term-missing \
-                            --junit-xml=pytest-report.xml
+                    // Ejecutar pruebas y cobertura con pytest en Windows
+                    bat '''
+                        call venv\\Scripts\\activate
+                        set PYTHONPATH=%CD%
+                        pytest --cov=app --cov-report=xml:coverage.xml --cov-report=term-missing --junit-xml=pytest-report.xml
                     '''
                 }
             }
         }
 
-
         stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'sonar-scanner'
+            }
             steps {
                 script {
-                    def scannerHome = tool 'sonar-scanner'
-
-                    // Ejecución de análisis SonarQube
+                    // Ejecución de análisis SonarQube en Windows
                     withSonarQubeEnv('server-sonar') {
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=suma-fastapi \
-                            -Dsonar.projectName='Mi Proyecto Python' \
-                            -Dsonar.sources=app \
-                            -Dsonar.tests=tests \
-                            -Dsonar.sourceEncoding=UTF-8 \
-                            -Dsonar.python.coverage.reportPaths=coverage.xml \
+                        bat """
+                            "%SCANNER_HOME%\\bin\\sonar-scanner" ^
+                            -Dsonar.projectKey=suma-fastapi ^
+                            -Dsonar.projectName='Mi Proyecto Python' ^
+                            -Dsonar.sources=app ^
+                            -Dsonar.tests=tests ^
+                            -Dsonar.sourceEncoding=UTF-8 ^
+                            -Dsonar.python.coverage.reportPaths=coverage.xml ^
                             -Dsonar.projectVersion=${env.BUILD_NUMBER}
                         """
                     }
@@ -59,7 +61,7 @@ pipeline {
     post {
         always {
             // Limpieza después de la ejecución
-            deleteDir()
+            bat 'rmdir /s /q venv'
         }
     }
 }
