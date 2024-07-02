@@ -10,9 +10,12 @@ pipeline {
         stage('Setup Python Environment') {
             steps {
                 script {
-                    // Instalación de dependencias en un entorno virtual
-                    sh 'python3 -m venv venv'
-                    sh './venv/bin/pip install -r requirements.txt'
+                    // Uso de 'bat' para comandos de Windows
+                    bat '''
+                        python -m venv venv
+                        call venv\\Scripts\\activate
+                        pip install -r requirements.txt
+                    '''
                 }
             }
         }
