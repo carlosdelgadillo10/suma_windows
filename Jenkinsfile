@@ -15,7 +15,7 @@ pipeline {
             steps {
                 script {
                     // Construir imagen Docker
-                    app = docker.build("carlosdelgadillo/sumaa")
+                    app = docker.build("carlosdelgadillo/suma_windows")
                 }
             }
         }
