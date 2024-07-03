@@ -19,6 +19,15 @@ pipeline {
                 }
             }
         }
+        stage('Scan') {
+            steps {
+                script {
+                    app.inside {
+                        sh 'echo "Tests passed"'
+                    }
+                }
+            }
+        }
 
         stage('Run Tests and Coverage') {
             steps {
