@@ -31,7 +31,7 @@ pipeline {
         stage('Deploy'){
             steps{
                 script{
-                    sh ("docker run -d -p 3333:3333 carlosdelgadillo/suma_windows:${BUILD_NUMBER}")
+                    sh ("docker run -d -p 8001:8001 carlosdelgadillo/suma_windows:${BUILD_NUMBER}")
                 }
             }
         }
